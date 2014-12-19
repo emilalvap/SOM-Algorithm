@@ -107,23 +107,23 @@ class SOM():
 				mini = dist
 				index = i
 		return index
+if __name__ == "__main__":
+	toleranceLimit = numpy.power(10,-6)
+	som = SOM(N = 2,maxK = 5,tolerance = toleranceLimit,Tdistance = 0.2,floatGamma = 0,alfaInicial = 1.0,alfaFinal = 0.8,variableGamma = True)
+	#centers
+	som.addInitialCenter([1.0,4.0],"Clase 1")
+	som.addInitialCenter([7.0,2.0],"Clase 2")
+	#training vectors
+	som.addTrainingVector([1.0,3.0])
+	som.addTrainingVector([1.0,5.0])
+	som.addTrainingVector([2.0,2.0])
+	som.addTrainingVector([6.0,3.0])
+	som.addTrainingVector([6.0,4.0])
+	som.addTrainingVector([7.0,3.0])
 
-toleranceLimit = numpy.power(10,-6)
-som = SOM(N = 2,maxK = 5,tolerance = toleranceLimit,Tdistance = 0.2,floatGamma = 0,alfaInicial = 1.0,alfaFinal = 0.8,variableGamma = True)
-#centers
-som.addInitialCenter([1.0,4.0],"Clase 1")
-som.addInitialCenter([7.0,2.0],"Clase 2")
-#training vectors
-som.addTrainingVector([1.0,3.0])
-som.addTrainingVector([1.0,5.0])
-som.addTrainingVector([2.0,2.0])
-som.addTrainingVector([6.0,3.0])
-som.addTrainingVector([6.0,4.0])
-som.addTrainingVector([7.0,3.0])
-
-som.doTraining()
-print ">>>>>>> Ejemplo diapo 25"
-print ">>> Centros finales"
-print som.getCenters()
-vector = [6.0,2.0]
-print ">>> El vector ", vector ," pertenece a la clase ", som.clasify(vector)
+	som.doTraining()
+	print ">>>>>>> Ejemplo diapo 25"
+	print ">>> Centros finales"
+	print som.getCenters()
+	vector = [6.0,2.0]
+	print ">>> El vector ", vector ," pertenece a la clase ", som.clasify(vector)
