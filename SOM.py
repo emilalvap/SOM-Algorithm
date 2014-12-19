@@ -3,7 +3,7 @@ import numpy
 
 class SOM():
 
-	def __init__(self,N,maxK,tolerance,Tdistance,floatGamma,alfaInicial,alfaFinal):
+	def __init__(self,N,maxK,tolerance,Tdistance,floatGamma,alfaInicial,alfaFinal,variableGamma):
 
 		self.N = N
 		self.centers = []
@@ -16,9 +16,12 @@ class SOM():
 		self.Tdistance = Tdistance
 		self.alfaInicial = alfaInicial
 		self.alfaFinal = alfaFinal
-
-	def getGammaK(self):
+		self.variableGamma = variableGamma
 	
+	def getGammaK(self):
+		
+		if(self.variableGamma == True):
+			return self.getVariableGamma()
 		return self.gammaK
 
 	def getVariableGamma(self):
@@ -44,7 +47,7 @@ class SOM():
 	def updateCenter(self,index,xVector):
 
 		tolerance = numpy.linalg.norm(numpy.subtract(self.centers[index],xVector))
-		self.centers[index] = numpy.add(self.centers[index],(numpy.dot(self.getVariableGamma(),numpy.subtract(xVector,self.centers[index]))))
+		self.centers[index] = numpy.add(self.centers[index],(numpy.dot(self.getGammaK(),numpy.subtract(xVector,self.centers[index]))))
 		return tolerance
 
 	def doTraining(self):
@@ -106,7 +109,7 @@ class SOM():
 		return index
 
 toleranceLimit = numpy.power(10,-6)
-som = SOM(N = 2,maxK = 5,tolerance = toleranceLimit,Tdistance = 0.2,floatGamma = 0,alfaInicial = 1.0,alfaFinal = 0.8)
+som = SOM(N = 2,maxK = 5,tolerance = toleranceLimit,Tdistance = 0.2,floatGamma = 0,alfaInicial = 1.0,alfaFinal = 0.8,variableGamma = True)
 #centers
 som.addInitialCenter([1.0,4.0],"Clase 1")
 som.addInitialCenter([7.0,2.0],"Clase 2")
