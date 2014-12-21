@@ -1,5 +1,5 @@
 import numpy
-
+import decimal
 
 class SOM():
 
@@ -10,10 +10,9 @@ class SOM():
 		self.centersNames = []
 		self.trainingVectors = []
 		self.maxK = maxK
-		self.gammaK = None
 		self.tolerance = tolerance
 		self.gammaK = floatGamma
-		self.Tdistance = Tdistance
+		self.Tdistance = float(Tdistance)
 		self.alfaInicial = alfaInicial
 		self.alfaFinal = alfaFinal
 		self.variableGamma = variableGamma
@@ -25,7 +24,6 @@ class SOM():
 		return self.gammaK
 
 	def getVariableGamma(self):
-
 		return 1.0/(float(10)+float(self.k)+1.0)
 
 	def setGammaK(self,floatGamma):
@@ -40,14 +38,18 @@ class SOM():
 
 		self.trainingVectors.append(tVector)
 
-	def trainCenter(self,xVector,updateIndex):
+	def trainCenter(self,xVector,updateIndex,vecinity):
 
-		return self.updateCenter(updateIndex,xVector)
+		return self.updateCenter(updateIndex,xVector,vecinity)
 
-	def updateCenter(self,index,xVector):
+	def updateCenter(self,index,xVector,vecinity):
 
-		tolerance = numpy.linalg.norm(numpy.subtract(self.centers[index],xVector))
-		self.centers[index] = numpy.add(self.centers[index],(numpy.dot(self.getGammaK(),numpy.subtract(xVector,self.centers[index]))))
+		
+		aux = self.centers[index]
+		#self.centers[index] = numpy.add(self.centers[index],(numpy.dot(self.getGammaK(),numpy.dot(vecinity,numpy.subtract(xVector,self.centers[index])))))
+		self.centers[index] = numpy.add(self.centers[index],numpy.dot(numpy.dot(self.getGammaK(),vecinity),numpy.subtract(xVector,self.centers[index])))
+		tolerance = numpy.linalg.norm(numpy.subtract(self.centers[index],aux))
+		
 		return tolerance
 
 	def doTraining(self):
@@ -57,40 +59,44 @@ class SOM():
 		for k in range(self.maxK):
 			self.k=k
 			for tVector in self.trainingVectors:
-				numberCentersAffected = 0
+				nup = 0
 				for i in range(len(self.centers)):
+
 					vecinity = self.calculateVecinity(tVector,self.centers[i],k)
-					print vecinity
-					if(vecinity > self.Tdistance):
-						tolerance = self.trainCenter(tVector,i)
-						numberCentersAffected += 1
 					
+					if(vecinity > self.Tdistance):
+						tolerance = self.trainCenter(tVector,i,vecinity)
+						nup+=1
+
 					if(vecinity > self.Tdistance and tolerance < self.tolerance):
 						toleranceBreak = True
+						print "Iteraciones rotas por limite de tolerancia"
 						break
-				if(toleranceBreak==True):
+
+				if(nup == 0 ):
+					for i in range(len(self.centers)):
+						vecinity = self.calculateVecinity(tVector,self.centers[i],k)
+						tolerance = self.trainCenter(tVector,i,vecinity)
+				if(toleranceBreak == True):
 					break
-
 			if(toleranceBreak==True):
-					break		
-
-		if(toleranceBreak==True):
-			print "Iteraciones rotas por limite de tolerancia"
+				break		
+		
+			
 
 
 	def calculateVecinity(self,v1,v2,k):
 
 		'''En los apuntes los elevados a k empiezan desde la iteracion 1... En el codigo empiezan desde 0, por eso se pone k+1'''
 		ak = numpy.dot(self.alfaInicial,numpy.power((self.alfaFinal/self.alfaInicial),((k+1)/float(self.maxK))))
-		dividend = numpy.power(numpy.linalg.norm(numpy.subtract(v1,v2)),2)
-		divisor = numpy.dot(2,numpy.power(ak,2))
+		dividend = numpy.power(numpy.linalg.norm(numpy.subtract(v1,v2)),2.0)
+		divisor = numpy.dot(2.0,numpy.power(ak,2.0))
 
-		vecinity = numpy.exp(numpy.dot(-1,(dividend/divisor)))
+		vecinity = numpy.exp(numpy.dot(-1.0,(dividend/divisor)))
 
 		return vecinity
 
 	def getCenters(self):
-
 		return self.centers
 
 	def clasify(self,vector):
@@ -107,8 +113,9 @@ class SOM():
 				mini = dist
 				index = i
 		return index
+
 if __name__ == "__main__":
-	toleranceLimit = numpy.power(10,-6)
+	toleranceLimit = numpy.power(10.0,-6)
 	som = SOM(N = 2,maxK = 5,tolerance = toleranceLimit,Tdistance = 0.2,floatGamma = 0,alfaInicial = 1.0,alfaFinal = 0.8,variableGamma = True)
 	#centers
 	som.addInitialCenter([1.0,4.0],"Clase 1")
